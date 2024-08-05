@@ -11,10 +11,10 @@ import (
 // # Wiring Spec Usage:
 //
 //	sauron.Logger(spec, "my_process")
-func Logger(spec wiring.WiringSpec, processName string, buffer_size int64) string {
+func Logger(spec wiring.WiringSpec, processName string, buffer_size string, outfile string) string {
 	logger := processName + "_sauron_logger"
 	spec.Define(logger, &SauronLogger{}, func(ns wiring.Namespace) (ir.IRNode, error) {
-		return newSauronLogger(logger, buffer_size)
+		return newSauronLogger(logger, buffer_size, outfile)
 	})
 	goproc.SetLogger(spec, processName, logger)
 	return logger

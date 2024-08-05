@@ -18,15 +18,17 @@ type SauronLogger struct {
 
 	LoggerName string
 	BufferSize string
+	Outfile    string
 	Spec       *workflowspec.Service
 }
 
-func newOTTraceLogger(name string, buffer_size string) (*SauronLogger, error) {
+func newSauronLogger(name string, buffer_size string, outfile string) (*SauronLogger, error) {
 	spec, err := workflowspec.GetService[runtime.SauronLogger]()
 	node := &SauronLogger{
 		LoggerName: name,
 		Spec:       spec,
 		BufferSize: buffer_size,
+		Outfile:    outfile,
 	}
 	return node, err
 }
@@ -64,7 +66,7 @@ func (node *SauronLogger) AddInstantiation(builder golang.NamespaceBuilder) erro
 
 	slog.Info(fmt.Sprintf("Instantiating SauronLogger %v in %v/%v", node.LoggerName, builder.Info().Package.PackageName, builder.Info().FileName))
 
-	return builder.DeclareConstructor(node.LoggerName, node.Spec.Constructor.AsConstructor(), []ir.IRNode{&ir.IRValue{Value: node.BufferSize}})
+	return builder.DeclareConstructor(node.LoggerName, node.Spec.Constructor.AsConstructor(), []ir.IRNode{&ir.IRValue{Value: node.BufferSize}, &ir.IRValue{Value: node.Outfile}})
 }
 
 // Implements ir.IRNode

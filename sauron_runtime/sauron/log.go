@@ -47,6 +47,7 @@ func (l *SauronLogger) msgFunc() {
 // Handle the generated message
 // RIght now only sends it to the consumer thread
 func (l *SauronLogger) handleMsg(ctx context.Context, msg string) {
+	log.Println(msg)
 	l.msg_chan <- msg
 }
 
@@ -86,19 +87,20 @@ func (l *SauronLogger) Logf(ctx context.Context, opts backend.LogOptions, format
 }
 
 // Initialize the logger
-func (l *SauronLogger) initLogger(buffer_size int64) {
+func (l *SauronLogger) initLogger(buffer_size int64, outfile string) {
 	l.msg_chan = make(chan string, l.BUFFER_SIZE)
+	l.outfile = outfile
 	go l.msgFunc()
 }
 
 // Returns a new logger object
-func NewSauronLogger(ctx context.Context, buffer_size_string string) (*SauronLogger, error) {
+func NewSauronLogger(ctx context.Context, buffer_size_string string, outfile string) (*SauronLogger, error) {
 	l := &SauronLogger{}
 	buffer_size, err := strconv.ParseInt(buffer_size_string, 10, 64)
 	if err != nil {
 		return nil, err
 	}
-	l.initLogger(buffer_size)
+	l.initLogger(buffer_size, outfile)
 	backend.SetDefaultLogger(l)
 	return l, nil
 }
